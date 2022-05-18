@@ -548,14 +548,13 @@ if [ "$DISTRO" = "Darwin" -a "$(uname -p)" = "arm" ]; then
     export GRPC_PYTHON_BUILD_SYSTEM_ZLIB=1
     echo "Set grpcio wheel build variables."
   else
-    unset GRPC_PYTHON_BUILD_SYSTEM_OPENSSL
-    unset GRPC_PYTHON_BUILD_SYSTEM_ZLIB
+    export GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=1
+    export GRPC_PYTHON_BUILD_SYSTEM_ZLIB=1
     unset CFLAGS
     unset LDFLAGS
   fi
   pip install -U -q pip setuptools wheel
   # ref: https://github.com/grpc/grpc/issues/28387
-  pip wheel -w ./wheelhouse --no-binary :all: grpcio grpcio-tools
   pyenv shell --unset
   pyenv uninstall -f tmp-grpcio-build
   echo "List of prebuilt wheels:"
@@ -615,12 +614,14 @@ cd "${INSTALL_PATH}/manager"
 pyenv local "venv-${ENV_ID}-manager"
 pip install -U -q pip setuptools wheel
 check_snappy
-pip install -U --find-links=../wheelhouse -e ../common -r requirements/dev.txt
+pip install -U -e ../common -r requirements/dev.txt
+GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=1 GRPC_PYTHON_BUILD_SYSTEM_ZLIB=1 pip install --no-binary :all: grpcio~=1.44.0 grpcio-tools --ignore-installed --no-cache
 
 cd "${INSTALL_PATH}/agent"
 pyenv local "venv-${ENV_ID}-agent"
 pip install -U -q pip setuptools wheel
-pip install -U --find-links=../wheelhouse -e ../common -r requirements/dev.txt
+pip install -U -e ../common -r requirements/dev.txt
+GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=1 GRPC_PYTHON_BUILD_SYSTEM_ZLIB=1 pip install --no-binary :all: grpcio~=1.44.0 grpcio-tools --ignore-installed --no-cache
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
   $sudo setcap cap_sys_ptrace,cap_sys_admin,cap_dac_override+eip $(readlinkf $(pyenv which python))
 fi
@@ -633,22 +634,26 @@ fi
 cd "${INSTALL_PATH}/common"
 pyenv local "venv-${ENV_ID}-common"
 pip install -U -q pip setuptools wheel
-pip install -U --find-links=../wheelhouse -r requirements/dev.txt
+pip install -U -r requirements/dev.txt
+GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=1 GRPC_PYTHON_BUILD_SYSTEM_ZLIB=1 pip install --no-binary :all: grpcio~=1.44.0 grpcio-tools --ignore-installed --no-cache
 
 cd "${INSTALL_PATH}/storage-proxy"
 pyenv local "venv-${ENV_ID}-storage-proxy"
 pip install -U -q pip setuptools wheel
-pip install -U --find-links=../wheelhouse -e ../common -r requirements/dev.txt
+pip install -U -e ../common -r requirements/dev.txt
+GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=1 GRPC_PYTHON_BUILD_SYSTEM_ZLIB=1 pip install --no-binary :all: grpcio~=1.44.0 grpcio-tools --ignore-installed --no-cache
 
 cd "${INSTALL_PATH}/webserver"
 pyenv local "venv-${ENV_ID}-webserver"
 pip install -U -q pip setuptools wheel
-pip install -U --find-links=../wheelhouse -e ../client-py -r requirements/dev.txt
+pip install -U -e ../client-py -r requirements/dev.txt
+GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=1 GRPC_PYTHON_BUILD_SYSTEM_ZLIB=1 pip install --no-binary :all: grpcio~=1.44.0 grpcio-tools --ignore-installed --no-cache
 
 cd "${INSTALL_PATH}/tester"
 pyenv local "venv-${ENV_ID}-tester"
 pip install -U -q pip setuptools wheel
-pip install -U --find-links=../wheelhouse -r requirements/dev.txt
+pip install -U -r requirements/dev.txt
+GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=1 GRPC_PYTHON_BUILD_SYSTEM_ZLIB=1 pip install --no-binary :all: grpcio~=1.44.0 grpcio-tools --ignore-installed --no-cache
 
 # Copy default configurations
 show_info "Copy default configuration files to manager / agent root..."
